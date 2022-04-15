@@ -1,0 +1,8 @@
+version: "2"
+services:
+  distill:
+    build: .
+    volumes:
+      #- .:/distill
+      - ${HOME}/.trivium:/home/temp/.trivium
+      - ${PWD}:/out
