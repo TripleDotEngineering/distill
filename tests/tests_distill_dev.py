@@ -1,9 +1,10 @@
 import distill.distill as d
 
-# Must uncomment the .csv and .json os.remove() calls in distill.py
-# To get input files for the first 
+# Must uncomment the .csv and .json os.remove() calls in distill.py to get input files
+# Must also run using the following command:
+# python3 -m pytest tests/tests_distill_dev.py -v
 
-# Test pytest functionality:
+# Test basic pytest functionality:
 # test_passes() should PASS, test_fails() should FAIL
 #####################
 # def test_passes():
