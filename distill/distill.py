@@ -32,6 +32,8 @@ def csv_to_json(csvFilePath, jsonFilePath):
         jsonString = json.dumps(jsonArray, indent=4)
         jsonf.write(jsonString)
 
+    return jsonArray
+
 def get_nodes(model_name, diagram_name):
     '''Grabs network model information regarding the graph nodes
     by using the Trivium API.'''
@@ -48,6 +50,11 @@ def get_nodes(model_name, diagram_name):
     params = {'ids' : ','.join(ids)}
     elements = trivium.api.element.get(model_name, params=params)
     nodes = [e for e in elements if e['type'] in ALLOWED_NODE_TYPES]
+
+    # Used for unit testing purposes.
+    # with open("test1_get_nodes.json", "w") as f:
+    #     f.write(str(nodes))
+
     return nodes
 
 # Grabs the edges from a user's Trivium diagram
@@ -70,6 +77,11 @@ def get_edges(model_name, diagram_name):
     nodes = [e for e in elements if e['type'] in ALLOWED_NODE_TYPES]
     node_ids = [e['id'] for e in nodes]
     edges = [e for e in elements if e['type'] in ALLOWED_EDGE_TYPES and e['source'] in node_ids and e['target'] in node_ids]
+    
+    # Used for unit testing purposes.
+    # with open("test1_get_edges.json", "w") as f:
+    #     f.write(str(edges))
+    
     return edges
 
 def create_graph(nodelist, edgelist):
@@ -129,6 +141,11 @@ def add_scores(jsonFilePath):
     power = len(str(int(max_score)))
     for ip in distill_info:
         distill_info[ip] = str(float(distill_info[ip])/(10**power))
+
+    # Used for unit testing purposes.
+    # with open("test1_added_scores.json", "w") as f:
+    #     f.write(str(distill_info))
+
     return distill_info
 
 def distill_score(filename):
@@ -196,7 +213,7 @@ def distill_score(filename):
     score_dict = add_scores(jsonFilePath)
 
     # deletes CSV file
-    os.remove(csvFilePath)
+    # os.remove(csvFilePath)
 
     return score_dict
 
@@ -225,8 +242,13 @@ def capture_cve(filename):
         cve_dict.update({key:cve_list})
         cve_list = []
 
+
+    # Used for unit testng purposes. 
+    # with open("test1_cve_info.json", "w") as f:
+    #     f.write(str(cve_dict))
+
     # deletes JSON file
-    os.remove(filename)
+    # os.remove(filename)
     return cve_dict
 
 def cve():
@@ -268,6 +290,12 @@ def update_model(model, diagram, ip_val, score_dict):
                 node['custom']['properties']['score'] = {'type':'string', 'value': str(score), 'units':''}
 
     trivium.api.element.patch(model, nodes)
+    return trivium.api.element.get(model, element=diagram)
+    # Used for unit testing purposes.
+    # with open("test1_trivium_get.json", "w") as f:
+    #     info = str(trivium.api.element.get(model, element=diagram))
+    #     f.write(info)
+
 
 def file_generator(name, node_ids, dictlist_nodes):
     '''Generates a PDF file that links to CVE information
@@ -287,7 +315,7 @@ def file_generator(name, node_ids, dictlist_nodes):
         f.write("")
         f.write("NodeIP: " + dictlist_nodes[i]["ip"] + "  \n")
         f.write("NodeID: " + dictlist_nodes[i]["id"] + "  \n")
-        f.write("**Distill Score:** " + dictlist_nodes[i]["score"] + "  \n")
+        f.write("**Distill Score:** " + str(dictlist_nodes[i]["score"]) + "  \n")
         f.write("[Go to this Node's Vulnerability Report](#cve-report-for-"+str(dictlist_nodes[i]["ip"])+")" + "  \n")
         f.write('\n')
 
@@ -297,13 +325,13 @@ def file_generator(name, node_ids, dictlist_nodes):
         f.write("\n\n")
         f.write("[RETURN TO TOP](#node-data-report)")
         f.write('\n\n')
-        cve_amount = len(dictlist_nodes[i]["cve"])
+        cve_amount = len(str(dictlist_nodes[i]["cve"]))
         f.write("**Number of Vulnerabilities in Node:** " + str(cve_amount) + "  \n\n")
 
         # Adds CVE data to markdown report.
         for cve in range(cve_amount):
-            cve_name = str(dictlist_nodes[i]["cve"][cve])
-            f.write("["+cve_name+"](https://cve.mitre.org/cgi-bin/cvename.cgi?name="+cve_name+") \n\n")
+            cve_name = dictlist_nodes[i]["cve"]
+            f.write("["+str(cve_name)+"](https://cve.mitre.org/cgi-bin/cvename.cgi?name="+str(cve_name)+") \n\n")
 
     f.close()
 
@@ -388,6 +416,8 @@ def main():
     # dictionaries that store distill scores and cve data.
     score_dict = distill_score(filename)
     cve_dict = cve()
+    os.remove('report.json')
+    os.remove('report.csv')
 
     # prints the contents of the previously created arraylist of dictionaries
     # ip_val stored as a string
@@ -400,6 +430,12 @@ def main():
     print("Updating Trivium Model with New Distill Scores...\n")
 
     update_model(model, diagram, ip_val, score_dict)
+
+    # Used for unit testing purposes.
+    # with open("test1_ip_val.json", "w") as f:
+    #     f.write(str(ip_val))
+    # with open("test1_score_dict.json", "w") as f:
+    #     f.write(str(score_dict))
 
     print("Creating NetworkX Model for Sublimate Usage...\n")
 
