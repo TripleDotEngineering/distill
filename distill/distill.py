@@ -416,6 +416,8 @@ def main():
     # dictionaries that store distill scores and cve data.
     score_dict = distill_score(filename)
     cve_dict = cve()
+    os.remove('report.json')
+    os.remove('report.csv')
 
     # prints the contents of the previously created arraylist of dictionaries
     # ip_val stored as a string

@@ -43,6 +43,8 @@ def test_get_nodes(input_get_nodes):
             del element['createdOn']
         if 'updatedOn' in element:
             del element['updatedOn']
+        if 'lastModifiedBy' in element:
+            del element['lastModifiedBy']
     assert output == input_get_nodes
 
 # Tests the get_edges() endpoint, with time-reliant fields removed.

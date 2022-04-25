@@ -1,5 +1,6 @@
 import pytest
 import json
+import os
 
 @pytest.fixture
 def input_graph_nodes():
@@ -70,3 +71,9 @@ def input_score_dict():
     with open('tests/assets/test1_score_dict.json') as score_dict_json:
         score_info = json.load(score_dict_json)
     return score_info
+
+# @pytest.fixture(scope="session")
+def pytest_sessionfinish(session):
+    print("Removing temp files...")
+    os.remove('report.json')
+    os.remove('report.csv')
